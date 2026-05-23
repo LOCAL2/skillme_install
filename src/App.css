@@ -613,6 +613,12 @@ h2 {
 
 .footer-link:hover { color: #c4b5fd; }
 
+.footer-original {
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .hero-section {

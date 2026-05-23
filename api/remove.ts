@@ -18,7 +18,7 @@ rm -rf "\$DEST"
 
 printf "  \${GREEN}✓\${RESET}  \${BOLD}Removed.\${RESET}  \${DIM}.kiro/steering/ui-ux-pro-max deleted\${RESET}\\n\\n"
 printf "  \${DIM}Restart Kiro to deactivate the skill.\${RESET}\\n"
-printf "  \${DIM}Customized & fixed by \${RESET}\${BOLD}Barron Nelly\${RESET}  \${DIM}- https://ui-ux-pro-max-skill.nextlevelbuilder.io\${RESET}\\n\\n"
+printf "  \${DIM}Customized & fixed by \${RESET}\${BOLD}Barron Nelly\${RESET}  \${DIM}- https://ui-ux-pro-max-skill.nextlevelbuilder.io (ต้นฉบับ)\${RESET}\\n\\n"
 `
 }
 
@@ -52,7 +52,7 @@ Write-Host ""
 Write-Host "  Restart Kiro to deactivate the skill." -ForegroundColor DarkGray
 Write-Host "  Customized & fixed by " -NoNewline -ForegroundColor DarkGray
 Write-Host "Barron Nelly" -NoNewline -ForegroundColor White
-Write-Host "  -  https://ui-ux-pro-max-skill.nextlevelbuilder.io" -ForegroundColor DarkGray
+Write-Host "  -  https://ui-ux-pro-max-skill.nextlevelbuilder.io (ต้นฉบับ)" -ForegroundColor DarkGray
 Write-Host ""
 `
 }
