@@ -1,0 +1,10 @@
+{
+  "buildCommand": "bun run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/api/files",      "destination": "/api/files" },
+    { "source": "/api/token",      "destination": "/api/token" },
+    { "source": "/api/install.sh", "destination": "/api/install-sh" },
+    { "source": "/api/install.ps1","destination": "/api/install-ps1" }
+  ]
+}

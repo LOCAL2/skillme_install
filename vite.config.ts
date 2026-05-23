@@ -3,156 +3,58 @@ import react, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
 import fs from 'fs'
 import path from 'path'
+import crypto from 'crypto'
 
 function skillInstallerPlugin(): Plugin {
   return {
     name: 'skill-installer',
     buildStart() {
-      const skillDir = path.resolve(process.cwd(), 'skill/ui-ux-pro-max')
-      const publicDir = path.resolve(process.cwd(), 'public')
-      const apiDir = path.join(publicDir, 'api')
+      const root = process.cwd()
 
-      // Ensure directories exist
-      if (!fs.existsSync(publicDir)) {
-        fs.mkdirSync(publicDir, { recursive: true })
-      }
-      if (!fs.existsSync(apiDir)) {
-        fs.mkdirSync(apiDir, { recursive: true })
-      }
-
-      // 1. Gather all files in skill/ui-ux-pro-max recursively
-      const files: { relativePath: string; content: string }[] = []
-      function getFilesRecursively(dir: string) {
-        if (!fs.existsSync(dir)) return
-        const items = fs.readdirSync(dir, { withFileTypes: true })
-        for (const item of items) {
-          const fullPath = path.join(dir, item.name)
-          if (item.isDirectory()) {
-            if (item.name !== '__pycache__') {
-              getFilesRecursively(fullPath)
-            }
-          } else if (item.isFile()) {
-            const relativePath = path.relative(skillDir, fullPath).replace(/\\/g, '/')
-            const content = fs.readFileSync(fullPath, 'utf8')
-            files.push({ relativePath, content })
-          }
+      // ── 1. Generate / read a stable install token ──────────────────────────
+      // In production Vercel reads INSTALL_TOKEN env var.
+      // Locally we write one to api/_token.txt so the dev server can use it.
+      const tokenFile = path.join(root, 'api', '_token.txt')
+      let token = process.env.INSTALL_TOKEN || ''
+      if (!token) {
+        if (fs.existsSync(tokenFile)) {
+          token = fs.readFileSync(tokenFile, 'utf8').trim()
+        } else {
+          token = crypto.randomBytes(24).toString('hex')
+          fs.mkdirSync(path.dirname(tokenFile), { recursive: true })
+          fs.writeFileSync(tokenFile, token, 'utf8')
+          console.log('[Skill Installer Plugin] Generated new install token → api/_token.txt')
         }
       }
-      getFilesRecursively(skillDir)
 
-      // Write files.json
-      fs.writeFileSync(path.join(apiDir, 'files.json'), JSON.stringify({ files }), 'utf8')
-
-      // 2. Generate static install.js
-      const installScript = `
-const http = require('http');
-const https = require('https');
-const fs = require('fs');
-const path = require('path');
-
-const baseUrl = process.argv[2] || 'http://localhost:5173';
-const destRoot = path.join(process.cwd(), '.kiro', 'steering', 'ui-ux-pro-max');
-
-function getJson(url) {
-  return new Promise((resolve, reject) => {
-    const getter = url.startsWith('https') ? https : http;
-    getter.get(url, (res) => {
-      if (res.statusCode !== 200) {
-        res.resume();
-        reject(new Error('Request Failed. Status Code: ' + res.statusCode));
-        return;
-      }
-      let data = '';
-      res.setEncoding('utf8');
-      res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => {
-        try {
-          resolve(JSON.parse(data));
-        } catch (e) {
-          reject(e);
+      // ── 2. Remove old static files that should no longer be public ─────────
+      const toRemove = [
+        path.join(root, 'public', 'install.js'),
+        path.join(root, 'public', 'install.sh'),
+        path.join(root, 'public', 'install.ps1'),
+        path.join(root, 'public', 'api', 'files.json'),
+      ]
+      for (const f of toRemove) {
+        if (fs.existsSync(f)) {
+          fs.rmSync(f)
+          console.log(`[Skill Installer Plugin] Removed public static: ${path.relative(root, f)}`)
         }
-      });
-    }).on('error', reject);
-  });
-}
-
-async function install() {
-  console.log('[Kiro Installer] Installing ui-ux-pro-max skill...');
-  try {
-    const { files } = await getJson(\`\${baseUrl}/api/files.json\`);
-    
-    let count = 0;
-    for (const file of files) {
-      const destPath = path.join(destRoot, file.relativePath);
-      const destDir = path.dirname(destPath);
-      
-      if (!fs.existsSync(destDir)) {
-        fs.mkdirSync(destDir, { recursive: true });
       }
-      
-      fs.writeFileSync(destPath, file.content, 'utf8');
-      count++;
-    }
-    console.log('[Kiro Installer] [SUCCESS] Installed ' + count + ' files to .kiro/steering/ui-ux-pro-max/');
-  } catch (err) {
-    console.error('[Kiro Installer] [ERROR] Installation failed:', err.message);
-    process.exit(1);
-  }
-}
+      // Remove empty public/api dir if empty
+      const apiDir = path.join(root, 'public', 'api')
+      if (fs.existsSync(apiDir) && fs.readdirSync(apiDir).length === 0) {
+        fs.rmdirSync(apiDir)
+      }
 
-install();
-`
-      fs.writeFileSync(path.join(publicDir, 'install.js'), installScript.trim(), 'utf8')
-
-      // 3. Generate static install.sh
-      const shScript = `#!/bin/bash
-ORIGIN=$1
-if [ -z "$ORIGIN" ]; then
-  ORIGIN="http://localhost:5173"
-fi
-
-if command -v node &> /dev/null; then
-  node -e "$(curl -fsSL $ORIGIN/install.js)" -- "$ORIGIN"
-elif command -v bun &> /dev/null; then
-  bun -e "$(curl -fsSL $ORIGIN/install.js)" -- "$ORIGIN"
-else
-  echo "Error: Node.js or Bun is required to run this installer. Please install Node.js or Bun."
-  exit 1
-fi
-`
-      fs.writeFileSync(path.join(publicDir, 'install.sh'), shScript.trim(), 'utf8')
-
-      // 4. Generate static install.ps1
-      const psScript = `
-if (-not $origin) {
-    $origin = "http://localhost:5173"
-}
-$OutputEncoding = [System.Text.Encoding]::UTF8
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-$runner = ""
-if (Get-Command node -ErrorAction SilentlyContinue) {
-    $runner = "node"
-} elseif (Get-Command bun -ErrorAction SilentlyContinue) {
-    $runner = "bun"
-} else {
-    Write-Error "Error: Node.js or Bun is required to run this installer. Please install Node.js or Bun."
-    exit 1
-}
-$js = Invoke-RestMethod -Uri "$origin/install.js"
-& $runner -e "$js" -- "$origin"
-`
-      fs.writeFileSync(path.join(publicDir, 'install.ps1'), psScript.trim(), 'utf8')
-
-      console.log('[Skill Installer Plugin] Static installation assets generated successfully in public/')
+      console.log('[Skill Installer Plugin] Token-protected install API ready.')
     }
   }
 }
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     babel({ presets: [reactCompilerPreset()] }),
-    skillInstallerPlugin()
+    skillInstallerPlugin(),
   ],
 })

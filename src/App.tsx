@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import type React from 'react'
 import Explorer from './Explorer'
 import './App.css'
@@ -61,16 +61,27 @@ function FeatureIcon({ name }: { name: string }) {
 
 export default function App() {
   const [activeOS, setActiveOS] = useState<OS>('mac')
+  const [token, setToken] = useState<string>('')
 
-  // Derive the server origin dynamically so the command always points
-  // to wherever THIS server is actually running (localhost or LAN IP).
+  // Fetch the install token from the API (served server-side, not a static file)
+  useEffect(() => {
+    fetch('/api/token')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(d => setToken(d.token ?? ''))
+      .catch(() => setToken(''))
+  }, [])
+
   const origin = useMemo(() => window.location.origin, [])
 
-  const commands = useMemo(() => ({
-    mac:        `curl -fsSL ${origin}/install.sh | bash -s "${origin}"`,
-    windows:    `node -e "$(curl -s ${origin}/install.js)" -- "${origin}"`,
-    powershell: `$origin='${origin}'; irm $origin/install.ps1 | iex`,
-  }), [origin])
+  // Token is embedded in the command — without it /api/files returns 403
+  const commands = useMemo(() => {
+    if (!token) return { mac: 'Loading…', windows: 'Loading…', powershell: 'Loading…' }
+    return {
+      mac:        `curl -fsSL ${origin}/api/install.sh | TOKEN=${token} bash`,
+      windows:    `set TOKEN=${token} && curl -fsSL ${origin}/api/install.js | node -- ${origin}`,
+      powershell: `$env:TOKEN='${token}'; irm ${origin}/api/install.ps1 | iex`,
+    }
+  }, [origin, token])
 
   return (
     <div className="page">
