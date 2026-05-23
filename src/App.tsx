@@ -114,7 +114,21 @@ export default function App() {
           <CopyButton text={commands[activeOS]} />
         </div>
         <p className="install-note">
-          Requires <code>node</code> · Installs to <code>.kiro/steering/{SKILL_NAME}/</code>
+          Requires <code>node</code> ·{' '}
+          <a
+            href="https://nodejs.org/en/download"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="install-note-link"
+          >
+            Download Node.js
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+          {' '}· Installs to <code>.kiro/steering/{SKILL_NAME}/</code>
         </p>
       </section>
 

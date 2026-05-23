@@ -289,6 +289,18 @@ h2 {
   margin: 0;
 }
 
+.install-note-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--primary-light);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition);
+}
+
+.install-note-link:hover { color: #c4b5fd; }
+
 .install-prereq {
   display: flex;
   align-items: center;
