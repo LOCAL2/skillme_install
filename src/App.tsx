@@ -26,7 +26,7 @@ const ORIGIN = 'https://skillme-install.vercel.app'
 const commands = {
   mac:        `curl -fsSL ${ORIGIN}/get | bash`,
   powershell: `irm ${ORIGIN}/get | iex`,
-  windows:    `node -e "require('https').get('${ORIGIN}/get',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>eval(d))})"`,
+  windows:    `powershell -c "irm ${ORIGIN}/get | iex"`,
 }
 
 type OS = 'mac' | 'windows' | 'powershell'
