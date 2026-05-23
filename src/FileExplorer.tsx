@@ -2,10 +2,9 @@ import { useState, useMemo } from 'react'
 import './FileExplorer.css'
 
 // ── Static file data bundled at build time ────────────────────────────────────
-// We import all skill files via Vite's import.meta.glob so no API call needed.
 const RAW_FILES = import.meta.glob(
-  '../../skill/ui-ux-pro-max/**/*',
-  { as: 'raw', eager: true }
+  '/skill/ui-ux-pro-max/**',
+  { query: '?raw', import: 'default', eager: true }
 )
 
 interface FileEntry {
@@ -17,15 +16,21 @@ interface FileEntry {
 
 // Build flat list from glob keys
 const FILES: FileEntry[] = Object.entries(RAW_FILES)
-  .filter(([k]) => !k.includes('__pycache__'))
+  .filter(([k]) => !k.includes('__pycache__') && !k.endsWith('.pyc'))
   .map(([k, content]) => {
-    // k looks like "../../skill/ui-ux-pro-max/data/colors.csv"
-    const path = k.replace('../../skill/ui-ux-pro-max/', '')
+    // k looks like "/skill/ui-ux-pro-max/data/colors.csv"
+    const path = k.replace('/skill/ui-ux-pro-max/', '')
     const name = path.split('/').pop()!
     const ext  = name.includes('.') ? name.split('.').pop()! : ''
     return { path, name, ext, content: content as string }
   })
-  .sort((a, b) => a.path.localeCompare(b.path))
+  .sort((a, b) => {
+    // folders before files, then alphabetical
+    const aDepth = a.path.split('/').length
+    const bDepth = b.path.split('/').length
+    if (aDepth !== bDepth) return aDepth - bDepth
+    return a.path.localeCompare(b.path)
+  })
 
 // ── Tree builder ──────────────────────────────────────────────────────────────
 interface TreeNode {
@@ -261,8 +266,8 @@ function CsvViewer({ content, search }: { content: string; search: string }) {
 
 // ── Main FileExplorer ─────────────────────────────────────────────────────────
 export default function FileExplorer() {
-  const [selected, setSelected] = useState<FileEntry>(
-    FILES.find(f => f.name === 'SKILL.md') ?? FILES[0]
+  const [selected, setSelected] = useState<FileEntry | null>(
+    FILES.find(f => f.name === 'SKILL.md') ?? FILES[0] ?? null
   )
   const [search, setSearch] = useState('')
   const [treeSearch, setTreeSearch] = useState('')
@@ -274,6 +279,15 @@ export default function FileExplorer() {
   }, [treeSearch])
 
   const filteredTree = useMemo(() => buildTree(visibleFiles), [visibleFiles])
+
+  // Guard: no files loaded (glob failed)
+  if (!selected || FILES.length === 0) {
+    return (
+      <div className="fe-root fe-empty">
+        <p>No skill files found. Make sure <code>skill/ui-ux-pro-max/</code> exists.</p>
+      </div>
+    )
+  }
 
   const lines = selected.content.split('\n').length
   const size  = (selected.content.length / 1024).toFixed(1)
