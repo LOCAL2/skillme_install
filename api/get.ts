@@ -30,51 +30,110 @@ function getFiles(): { relativePath: string; content: string }[] {
 }
 
 function bashScript(files: { relativePath: string; content: string }[]): string {
-  // Embed files as a JSON payload inside the bash script — no second request needed
-  const payload = JSON.stringify(files)
-    .replace(/\\/g, '\\\\')
-    .replace(/'/g, "'\\''")
+  const total = files.length
 
   return `#!/usr/bin/env bash
 set -euo pipefail
 
-DEST="\${PWD}/.kiro/steering/ui-ux-pro-max"
+# ── colors ──────────────────────────────────────────────────────────────────
+BOLD="\\033[1m"; DIM="\\033[2m"; GREEN="\\033[32m"; CYAN="\\033[36m"
+YELLOW="\\033[33m"; RESET="\\033[0m"
 
-echo "  Installing ui-ux-pro-max..."
+# ── spinner ──────────────────────────────────────────────────────────────────
+spin() {
+  local pid=$1 msg=$2
+  local frames=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+  local i=0
+  while kill -0 "$pid" 2>/dev/null; do
+    printf "\\r  \${CYAN}\${frames[$i]}\${RESET}  %s" "$msg"
+    i=$(( (i+1) % \${#frames[@]} ))
+    sleep 0.08
+  done
+  printf "\\r"
+}
 
-node - <<'JSEOF'
+printf "\\n  \${BOLD}ui-ux-pro-max\${RESET}  \${DIM}Kiro Skill Installer\${RESET}\\n\\n"
+printf "  \${DIM}Fetching ${total} files from server...\${RESET}\\n"
+
+node - <<'JSEOF' &
 const fs = require('fs'), path = require('path')
 const files = ${JSON.stringify(files)}
 const base  = path.join(process.cwd(), '.kiro', 'steering', 'ui-ux-pro-max')
-files.forEach(f => {
+const total = files.length
+
+process.stdout.write('\\r  \\x1b[36m◆\\x1b[0m  Writing files...                    ')
+
+files.forEach((f, i) => {
   const p = path.join(base, f.relativePath)
   fs.mkdirSync(path.dirname(p), { recursive: true })
   fs.writeFileSync(p, f.content, 'utf8')
+
+  const pct  = Math.round(((i + 1) / total) * 100)
+  const done = Math.round(pct / 5)
+  const bar  = '█'.repeat(done) + '░'.repeat(20 - done)
+  process.stdout.write('\\r  \\x1b[36m' + bar + '\\x1b[0m  ' + pct + '%  ')
 })
-console.log('  ✓ Installed ' + files.length + ' files → .kiro/steering/ui-ux-pro-max')
+
+process.stdout.write('\\n')
 JSEOF
+
+NODE_PID=$!
+spin $NODE_PID "Installing..."
+wait $NODE_PID
+
+printf "  \${GREEN}✓\${RESET}  \${BOLD}Done!\${RESET}  ${total} files → \${DIM}.kiro/steering/ui-ux-pro-max\${RESET}\\n\\n"
+printf "  \${DIM}Restart Kiro to activate the skill.\${RESET}\\n\\n"
 `
 }
 
 function ps1Script(files: { relativePath: string; content: string }[]): string {
   const json = JSON.stringify(files).replace(/'/g, "''")
+  const total = files.length
+
   return `$ErrorActionPreference = 'Stop'
 $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-Write-Host "  Installing ui-ux-pro-max..."
+Write-Host ""
+Write-Host "  " -NoNewline
+Write-Host "ui-ux-pro-max" -NoNewline -ForegroundColor White
+Write-Host "  Kiro Skill Installer" -ForegroundColor DarkGray
+Write-Host ""
+
+# Spinner frames
+$frames = @("⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏")
+$fi = 0
+
+Write-Host "  Fetching ${total} files from server..." -ForegroundColor DarkGray
 
 $files = '${json}' | ConvertFrom-Json
 $base  = Join-Path (Get-Location) ".kiro/steering/ui-ux-pro-max"
+$count = 0
+$t     = $files.Count
 
 foreach ($f in $files) {
   $dest = Join-Path $base $f.relativePath
   $dir  = Split-Path $dest -Parent
   if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
   [System.IO.File]::WriteAllText($dest, $f.content, [System.Text.Encoding]::UTF8)
+  $count++
+
+  # Progress bar
+  $pct  = [int](($count / $t) * 100)
+  $done = [int]($pct / 5)
+  $bar  = ("█" * $done) + ("░" * (20 - $done))
+  Write-Host ("\r  " + $bar + "  " + $pct + "%   ") -NoNewline -ForegroundColor Cyan
 }
 
-Write-Host "  v Installed $($files.Count) files -> .kiro/steering/ui-ux-pro-max"
+Write-Host ""
+Write-Host ""
+Write-Host "  " -NoNewline
+Write-Host "✓" -NoNewline -ForegroundColor Green
+Write-Host "  Done!  " -NoNewline -ForegroundColor White
+Write-Host "$count files → .kiro/steering/ui-ux-pro-max" -ForegroundColor DarkGray
+Write-Host ""
+Write-Host "  Restart Kiro to activate the skill." -ForegroundColor DarkGray
+Write-Host ""
 `
 }
 
