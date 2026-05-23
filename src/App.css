@@ -163,7 +163,7 @@ h2 {
 /* ── Install Section ── */
 .install-section {
   padding-top: 80px;
-  padding-bottom: 80px;
+  padding-bottom: 40px;
   border-top: 1px solid var(--border);
 }
 
