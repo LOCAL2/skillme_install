@@ -113,23 +113,34 @@ export default function App() {
           <code className="command-text">{commands[activeOS]}</code>
           <CopyButton text={commands[activeOS]} />
         </div>
-        <p className="install-note">
-          Requires <code>node</code> ·{' '}
+
+        <div className="install-footer">
+          <div className="install-note">
+            Installs to <code>.kiro/steering/{SKILL_NAME}/</code>
+          </div>
           <a
             href="https://nodejs.org/en/download"
             target="_blank"
             rel="noopener noreferrer"
-            className="install-note-link"
+            className="node-download-btn"
+            aria-label="Download Node.js (required)"
           >
-            Download Node.js
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            {/* Official Node.js hex logo */}
+            <svg width="20" height="22" viewBox="0 0 256 289" aria-hidden="true">
+              <path fill="#539E43" d="M128 288.464c-3.975 0-7.685-1.06-11.13-2.915l-35.247-20.936c-5.3-2.915-2.65-3.975-1.06-4.505 7.155-2.385 8.48-2.915 15.9-7.155.796-.53 1.856-.265 2.65.265l27.032 16.166c1.06.53 2.385.53 3.18 0l105.74-61.217c1.06-.53 1.59-1.59 1.59-2.915V83.08c0-1.325-.53-2.385-1.59-2.915L128.795 18.948c-1.06-.53-2.385-.53-3.18 0L19.874 80.165c-1.06.53-1.59 1.855-1.59 2.915v122.17c0 1.06.53 2.385 1.59 2.915l28.887 16.695c15.635 7.95 25.44-1.325 25.44-10.6V94.21c0-1.59 1.325-3.18 3.18-3.18h13.516c1.59 0 3.18 1.325 3.18 3.18V214.26c0 20.936-11.395 32.86-31.27 32.86-6.095 0-10.865 0-24.38-6.625L9.274 223.8C3.444 220.62 0 214.525 0 208.165V85.995c0-6.36 3.444-12.455 9.274-15.635L118.87 9.143c5.565-3.18 13.25-3.18 18.815 0l109.45 61.217c5.83 3.18 9.274 9.274 9.274 15.635v122.17c0 6.36-3.444 12.455-9.274 15.635l-109.45 61.217c-3.445 1.59-7.42 2.385-11.13 2.385l-.53.265z"/>
+              <path fill="#539E43" d="M161.532 204.45c-46.277 0-55.816-21.2-55.816-39.22 0-1.59 1.325-3.18 3.18-3.18h13.78c1.59 0 2.915 1.06 2.915 2.65 2.12 14.045 8.215 20.936 36.206 20.936 22.26 0 31.8-5.035 31.8-16.96 0-6.89-2.65-11.925-37.266-15.37-28.887-2.915-46.807-9.274-46.807-32.33 0-21.466 18.02-34.187 48.232-34.187 33.92 0 50.616 11.66 52.736 37.1.265 1.59-1.06 3.18-2.65 3.18h-13.78c-1.325 0-2.65-1.06-2.915-2.385-3.18-14.575-11.395-19.345-33.655-19.345-24.645 0-27.56 8.745-27.56 15.105 0 7.95 3.445 10.07 36.206 14.31 32.5 4.24 47.867 10.335 47.867 33.125-.265 23.32-19.345 36.57-52.471 36.57z"/>
+            </svg>
+            <div className="node-btn-text">
+              <span className="node-btn-label">Requires Node.js</span>
+              <span className="node-btn-sub">Download free at nodejs.org</span>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="node-btn-arrow" aria-hidden="true">
               <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
               <polyline points="15 3 21 3 21 9"/>
               <line x1="10" y1="14" x2="21" y2="3"/>
             </svg>
           </a>
-          {' '}· Installs to <code>.kiro/steering/{SKILL_NAME}/</code>
-        </p>
+        </div>
       </section>
 
       {/* ── FEATURES ── */}
