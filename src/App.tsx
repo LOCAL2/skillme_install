@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState } from 'react'
 import type React from 'react'
 import Explorer from './Explorer'
 import './App.css'
@@ -16,11 +16,18 @@ const features = [
 ]
 
 const steps = [
-  { num: '01', title: 'Start this server', desc: 'Run bun dev (or npm run dev) in this project to start the install server' },
-  { num: '02', title: 'Copy install command', desc: 'Copy the command for your OS — it fetches files from this server' },
-  { num: '03', title: 'Run in your project', desc: 'Open your target project terminal and paste the command' },
-  { num: '04', title: 'Start designing', desc: 'Ask Kiro to build UI and it will use the skill automatically' },
+  { num: '01', title: 'Copy install command', desc: 'Pick your shell and copy the one-liner below' },
+  { num: '02', title: 'Run in your project root', desc: 'Open the terminal in your project and paste it' },
+  { num: '03', title: 'Done', desc: 'Kiro picks up the skill automatically on next session' },
 ]
+
+const ORIGIN = 'https://skillme-install.vercel.app'
+
+const commands = {
+  mac:        `curl -fsSL ${ORIGIN}/get | bash`,
+  powershell: `irm ${ORIGIN}/get | iex`,
+  windows:    `node -e "require('https').get('${ORIGIN}/get',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>eval(d))})"`,
+}
 
 type OS = 'mac' | 'windows' | 'powershell'
 
@@ -61,27 +68,6 @@ function FeatureIcon({ name }: { name: string }) {
 
 export default function App() {
   const [activeOS, setActiveOS] = useState<OS>('mac')
-  const [token, setToken] = useState<string>('')
-
-  // Fetch the install token from the API (served server-side, not a static file)
-  useEffect(() => {
-    fetch('/api/token')
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(d => setToken(d.token ?? ''))
-      .catch(() => setToken(''))
-  }, [])
-
-  const origin = useMemo(() => window.location.origin, [])
-
-  // Token is embedded in the command — without it /api/files returns 403
-  const commands = useMemo(() => {
-    if (!token) return { mac: 'Loading…', windows: 'Loading…', powershell: 'Loading…' }
-    return {
-      mac:        `curl -fsSL ${origin}/api/install.sh | TOKEN=${token} bash`,
-      windows:    `set TOKEN=${token} && curl -fsSL ${origin}/api/install.js | node -- ${origin}`,
-      powershell: `$env:TOKEN='${token}'; irm ${origin}/api/install.ps1 | iex`,
-    }
-  }, [origin, token])
 
   return (
     <div className="page">
@@ -111,22 +97,14 @@ export default function App() {
       <section className="install-section" aria-labelledby="install-heading">
         <h2 id="install-heading">Install in one command</h2>
         <p className="section-desc">
-          Keep this server running, then paste the command below into the <strong>terminal of your target project</strong>.
-          It fetches all skill files from this server and writes them to <code>{SKILL_DEST}/</code>.
+          Run from the <strong>root of your project</strong> — installs the skill into{' '}
+          <code>{SKILL_DEST}/</code> where Kiro picks it up automatically.
         </p>
-
-        <div className="install-prereq">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <span>Requires <strong>Node.js</strong> or <strong>Bun</strong> installed in the target project environment</span>
-        </div>
-
         <div className="os-tabs" role="tablist" aria-label="Operating system">
-          {(['mac', 'windows', 'powershell'] as OS[]).map((os) => (
+          {(['mac', 'powershell', 'windows'] as OS[]).map((os) => (
             <button key={os} role="tab" type="button" aria-selected={activeOS === os}
               className={`os-tab ${activeOS === os ? 'active' : ''}`} onClick={() => setActiveOS(os)}>
-              {os === 'mac' ? 'macOS / Linux' : os === 'windows' ? 'Windows (CMD)' : 'PowerShell'}
+              {os === 'mac' ? 'macOS / Linux' : os === 'powershell' ? 'PowerShell' : 'Windows (CMD)'}
             </button>
           ))}
         </div>
@@ -136,7 +114,7 @@ export default function App() {
           <CopyButton text={commands[activeOS]} />
         </div>
         <p className="install-note">
-          Installs to <code>.kiro/steering/{SKILL_NAME}/</code> — Kiro loads it automatically on every session.
+          Requires <code>node</code> · Installs to <code>.kiro/steering/{SKILL_NAME}/</code>
         </p>
       </section>
 
