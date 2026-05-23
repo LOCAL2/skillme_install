@@ -208,10 +208,10 @@ h2 {
   background: #0a0a0f;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 18px 20px;
+  padding: 16px 20px;
   margin-bottom: 16px;
   box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.04);
-  overflow-x: auto;
+  min-width: 0;
 }
 
 .prompt {
@@ -226,13 +226,31 @@ h2 {
 .command-text {
   flex: 1;
   font-family: var(--font-mono);
-  font-size: 14px;
+  font-size: 13px;
   color: #e2e8f0;
-  white-space: nowrap;
   background: none;
   border: none;
   padding: 0;
   min-width: 0;
+  /* scroll horizontally inside the box, never wrap */
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.12) transparent;
+  /* fade-out right edge to hint there's more text */
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+  mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+}
+
+.command-text::-webkit-scrollbar {
+  height: 3px;
+}
+.command-text::-webkit-scrollbar-track {
+  background: transparent;
+}
+.command-text::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+  border-radius: 999px;
 }
 
 .copy-btn {
@@ -501,14 +519,8 @@ h2 {
   }
 
   .command-box {
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .command-text {
-    width: 100%;
-    white-space: pre-wrap;
-    word-break: break-all;
+    gap: 8px;
+    padding: 14px 16px;
   }
 }
 
