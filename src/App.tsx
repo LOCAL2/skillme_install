@@ -29,6 +29,12 @@ const commands = {
   windows:    `powershell -c "irm ${ORIGIN}/get | iex"`,
 }
 
+const removeCommands = {
+  mac:        `curl -fsSL ${ORIGIN}/remove | bash`,
+  powershell: `irm ${ORIGIN}/remove | iex`,
+  windows:    `powershell -c "irm ${ORIGIN}/remove | iex"`,
+}
+
 type OS = 'mac' | 'windows' | 'powershell'
 
 function CopyButton({ text }: { text: string }) {
@@ -68,6 +74,7 @@ function FeatureIcon({ name }: { name: string }) {
 
 export default function App() {
   const [activeOS, setActiveOS] = useState<OS>('mac')
+  const [activeUninstallOS, setActiveUninstallOS] = useState<OS>('mac')
 
   return (
     <div className="page">
@@ -143,6 +150,26 @@ export default function App() {
         </div>
       </section>
 
+      {/* ── UNINSTALL ── */}
+      <section className="uninstall-section" aria-labelledby="uninstall-heading">
+        <h3 id="uninstall-heading">Uninstall</h3>
+        <div className="uninstall-row">
+          <div className="os-tabs os-tabs-sm" role="tablist" aria-label="OS for uninstall">
+            {(['mac', 'powershell', 'windows'] as OS[]).map((os) => (
+              <button key={os} role="tab" type="button" aria-selected={activeUninstallOS === os}
+                className={`os-tab ${activeUninstallOS === os ? 'active' : ''}`} onClick={() => setActiveUninstallOS(os)}>
+                {os === 'mac' ? 'macOS / Linux' : os === 'powershell' ? 'PowerShell' : 'Windows (CMD)'}
+              </button>
+            ))}
+          </div>
+          <div className="command-box command-box-sm" role="tabpanel">
+            <span className="prompt" aria-hidden="true">$</span>
+            <code className="command-text">{removeCommands[activeUninstallOS]}</code>
+            <CopyButton text={removeCommands[activeUninstallOS]} />
+          </div>
+        </div>
+      </section>
+
       {/* ── FEATURES ── */}
       <section className="features-section" aria-labelledby="features-heading">
         <h2 id="features-heading">What's inside</h2>
@@ -190,7 +217,31 @@ export default function App() {
 
       {/* ── FOOTER ── */}
       <footer className="footer">
-        <p><strong>{SKILL_NAME}</strong> — a Kiro Skill for professional UI/UX design</p>
+        <div className="footer-credit">
+          <p>
+            <strong>{SKILL_NAME}</strong>
+            <span className="footer-sep">·</span>
+            a Kiro Skill for professional UI/UX design
+          </p>
+          <p className="footer-by">
+            Customized & fixed by{' '}
+            <strong>Barron Nelly</strong>
+            <span className="footer-sep">·</span>
+            <a
+              href="https://ui-ux-pro-max-skill.nextlevelbuilder.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="footer-link"
+            >
+              ui-ux-pro-max-skill.nextlevelbuilder.io
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+            </a>
+          </p>
+        </div>
       </footer>
     </div>
   )

@@ -2,6 +2,7 @@
   "buildCommand": "bun run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/get", "destination": "/api/get" }
+    { "source": "/get",    "destination": "/api/get" },
+    { "source": "/remove", "destination": "/api/remove" }
   ]
 }

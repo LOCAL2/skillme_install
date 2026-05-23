@@ -82,7 +82,8 @@ spin $NODE_PID "Installing..."
 wait $NODE_PID
 
 printf "  \${GREEN}✓\${RESET}  \${BOLD}Done!\${RESET}  ${total} files → \${DIM}.kiro/steering/ui-ux-pro-max\${RESET}\\n\\n"
-printf "  \${DIM}Restart Kiro to activate the skill.\${RESET}\\n\\n"
+printf "  \${DIM}Restart Kiro to activate the skill.\${RESET}\\n"
+printf "  \${DIM}Customized & fixed by \${RESET}\${BOLD}Barron Nelly\${RESET}  \${DIM}· https://ui-ux-pro-max-skill.nextlevelbuilder.io\${RESET}\\n\\n"
 `
 }
 
@@ -133,6 +134,9 @@ Write-Host "  Done!  " -NoNewline -ForegroundColor White
 Write-Host "$count files → .kiro/steering/ui-ux-pro-max" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  Restart Kiro to activate the skill." -ForegroundColor DarkGray
+Write-Host "  Customized & fixed by " -NoNewline -ForegroundColor DarkGray
+Write-Host "Barron Nelly" -NoNewline -ForegroundColor White
+Write-Host "  ·  https://ui-ux-pro-max-skill.nextlevelbuilder.io" -ForegroundColor DarkGray
 Write-Host ""
 `
 }

@@ -380,6 +380,38 @@ h2 {
   border-radius: 4px;
 }
 
+/* ── Uninstall Section ── */
+.uninstall-section {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.uninstall-section h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 0 0 14px;
+}
+
+.uninstall-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.os-tabs-sm { width: fit-content; }
+
+.command-box-sm {
+  padding: 12px 16px;
+}
+
+.command-box-sm .command-text {
+  font-size: 12px;
+}
+
 /* ── Features Section ── */
 .features-section {
   padding-top: 80px;
@@ -541,15 +573,45 @@ h2 {
   text-align: center;
 }
 
+.footer-credit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
 .footer p {
   font-size: 14px;
   color: var(--text-muted);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.footer strong {
-  color: var(--text);
+.footer strong { color: var(--text); }
+
+.footer-sep {
+  opacity: 0.3;
 }
+
+.footer-by {
+  font-size: 13px;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--primary-light);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color var(--transition);
+}
+
+.footer-link:hover { color: #c4b5fd; }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
