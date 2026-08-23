@@ -41,9 +41,9 @@ printf "  \${BOLD}Select your AI Agent (Use Arrow Keys and Enter):\${RESET}\\n"
 # ── interactive menu ────────────────────────────────────────────────────────
 exec < /dev/tty
 
-agents=("Kiro (Native Skill System)" "Cursor (Cursor IDE)" "Claude (Claude integration)" "Antigravity (AGY System)" "Copilot (GitHub Copilot)" "Windsurf (Codeium rules)")
-paths=(".kiro/steering/" ".cursor/rules/" ".clinerules/" ".agents/skills/" ".github/copilot-instructions/" ".windsurf/rules/")
-names=("Kiro" "Cursor" "Claude" "Antigravity" "Copilot" "Windsurf")
+agents=("Kiro (Native Skill System)" "Cursor (Cursor IDE)" "Cline (VSCode Extension)" "Claude Code (Anthropic CLI)" "Antigravity (AGY System)" "Copilot (GitHub Copilot)" "Windsurf (Codeium rules)")
+paths=(".kiro/steering/" ".cursor/rules/" ".clinerules/" ".claude/" ".agents/skills/" ".github/copilot-instructions/" ".windsurf/rules/")
+names=("Kiro" "Cursor" "Cline" "Claude Code" "Antigravity" "Copilot" "Windsurf")
 
 idx=0
 # hide cursor
@@ -139,9 +139,9 @@ Write-Host "ui-ux-pro-max" -NoNewline -ForegroundColor White
 Write-Host "  Skill Installer" -ForegroundColor DarkGray
 Write-Host ""
 
-$agents = @("Kiro (Native Skill System)", "Cursor (Cursor IDE)", "Claude (Claude integration)", "Antigravity (AGY System)", "Copilot (GitHub Copilot)", "Windsurf (Codeium rules)")
-$paths = @(".kiro/steering/", ".cursor/rules/", ".clinerules/", ".agents/skills/", ".github/copilot-instructions/", ".windsurf/rules/")
-$names = @("Kiro", "Cursor", "Claude", "Antigravity", "Copilot", "Windsurf")
+$agents = @("Kiro (Native Skill System)", "Cursor (Cursor IDE)", "Cline (VSCode Extension)", "Claude Code (Anthropic CLI)", "Antigravity (AGY System)", "Copilot (GitHub Copilot)", "Windsurf (Codeium rules)")
+$paths = @(".kiro/steering/", ".cursor/rules/", ".clinerules/", ".claude/", ".agents/skills/", ".github/copilot-instructions/", ".windsurf/rules/")
+$names = @("Kiro", "Cursor", "Cline", "Claude Code", "Antigravity", "Copilot", "Windsurf")
 $idx = 0
 
 Write-Host "  Select your AI Agent (Use Arrow Keys and Enter):" -ForegroundColor White
