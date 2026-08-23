@@ -15,9 +15,9 @@ const ORIGIN = 'https://skillme-install.vercel.app'
 
 function getCommands() {
   return {
-    mac:        `curl -fsSL ${ORIGIN} | bash`,
-    powershell: `irm ${ORIGIN} | iex`,
-    windows:    `powershell -c "irm ${ORIGIN} | iex"`,
+    mac:        `curl -fsSL ${ORIGIN}/install | bash`,
+    powershell: `irm ${ORIGIN}/install | iex`,
+    windows:    `powershell -c "irm ${ORIGIN}/install | iex"`,
   }
 }
 
