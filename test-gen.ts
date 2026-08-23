@@ -41,9 +41,9 @@ printf "  \${BOLD}Select your AI Agent (Use Arrow Keys and Enter):\${RESET}\\n"
 # ── interactive menu ────────────────────────────────────────────────────────
 exec < /dev/tty
 
-agents=("Kiro (Native Skill System)" "Cursor (Cursor IDE)" "Claude (Claude integration)" "Antigravity (AGY System)" "Copilot (GitHub Copilot)" "Windsurf (Codeium rules)")
+agents=("Kiro (Native Skill System)" "Cursor (Cursor IDE)" "Cline (Claude integration)" "Antigravity (AGY System)" "Copilot (GitHub Copilot)" "Windsurf (Codeium rules)")
 paths=(".kiro/steering/" ".cursor/rules/" ".clinerules/" ".agents/skills/" ".github/copilot-instructions/" ".windsurf/rules/")
-names=("Kiro" "Cursor" "Claude" "Antigravity" "Copilot" "Windsurf")
+names=("Kiro" "Cursor" "Cline" "Antigravity" "Copilot" "Windsurf")
 
 idx=0
 # hide cursor
@@ -139,9 +139,9 @@ Write-Host "ui-ux-pro-max" -NoNewline -ForegroundColor White
 Write-Host "  Skill Installer" -ForegroundColor DarkGray
 Write-Host ""
 
-$agents = @("Kiro (Native Skill System)", "Cursor (Cursor IDE)", "Claude (Claude integration)", "Antigravity (AGY System)", "Copilot (GitHub Copilot)", "Windsurf (Codeium rules)")
+$agents = @("Kiro (Native Skill System)", "Cursor (Cursor IDE)", "Cline (Claude integration)", "Antigravity (AGY System)", "Copilot (GitHub Copilot)", "Windsurf (Codeium rules)")
 $paths = @(".kiro/steering/", ".cursor/rules/", ".clinerules/", ".agents/skills/", ".github/copilot-instructions/", ".windsurf/rules/")
-$names = @("Kiro", "Cursor", "Claude", "Antigravity", "Copilot", "Windsurf")
+$names = @("Kiro", "Cursor", "Cline", "Antigravity", "Copilot", "Windsurf")
 $idx = 0
 
 Write-Host "  Select your AI Agent (Use Arrow Keys and Enter):" -ForegroundColor White
@@ -209,7 +209,7 @@ Write-Host ""
 `
 }
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
+function handler() {
   const ua = (req.headers['user-agent'] ?? '').toLowerCase()
   const isPowerShell = ua.includes('powershell') || ua.includes('windowspowershell')
 
@@ -218,6 +218,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
     ? ps1Script(files)
     : bashScript(files)
 
-  res.setHeader('Content-Type', 'text/plain; charset=utf-8')
-  res.send(script)
+  const testCode = getScript.replace('export default function handler(req: VercelRequest, res: VercelResponse)', 'function handler()') 
+  + '\n\nfs.writeFileSync("test.sh", bashScript(getFiles())); fs.writeFileSync("test.ps1", ps1Script(getFiles()));';
+fs.writeFileSync('test-gen.ts', testCode);
 }

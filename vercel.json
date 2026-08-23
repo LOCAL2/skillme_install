@@ -2,6 +2,17 @@
   "buildCommand": "bun run build",
   "outputDirectory": "dist",
   "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(curl|wget|powershell).*"
+        }
+      ],
+      "destination": "/api/get"
+    },
     { "source": "/get",    "destination": "/api/get" },
     { "source": "/remove", "destination": "/api/remove" }
   ]
